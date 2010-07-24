@@ -1,0 +1,55 @@
+#!/bin/bash
+
+URL="$1"
+
+notify()
+{
+    TXT=$(echo $1 | sed -e 's|&|&amp;|g' -e 's|<|&lt;|g' -e 's|>|&gt;|g')
+    notify-send "$TXT"
+}
+
+if [[ ( -e "$URL" ) || ($(echo "$URL" | cut -d':' -f1) == "file") ]]; then
+    URL=$(echo "$URL" | sed -e 's|^file://||')
+    MIME=$(file -b --mime-type "$URL")
+    case $MIME in
+        *symlink)
+            URL=$(readlink "$URL")
+            exec $0 "$URL"
+            ;;
+        audio*)
+            ps -U $USER -o cmd | grep ^cmus 2>/dev/null
+            if [ $? == 1 ]; then
+                xcmus &
+                sleep 3
+            fi
+            exec cmus-remote -q "$URL"
+            ;;
+        video*)
+            exec mplayer "$URL"
+            ;;
+        image*)
+            exec geeqie "$URL"
+            ;;
+        text*)
+            exec gvim --remote "$URL"
+            ;;
+        *directory)
+            exec thunar "$URL"
+            ;;
+        *pdf|*dvi)
+            exec evince "$URL"
+            ;;
+        *)
+            notify "No viewer for mimetype $MIME!"
+            exit 1
+            ;;
+    esac
+elif echo $URL | grep -iq '^magnet:'; then
+    transmission-remote -a "$URL"
+    notify "Added magnet link:
+$URL"
+elif echo $URL | grep -iq '^http\(s\)\?://'; then
+    chromium "$URL"
+else
+    notify "No handler for \"$URL\""
+fi
