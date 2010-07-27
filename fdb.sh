@@ -8,37 +8,40 @@ else
 fi
 
 # settings and cache files {{{
-cache_file="$XDG_CACHE_HOME"
-[ "x$XDG_CACHE_HOME" = "x" ] && cache_file="${HOME}/.cache"
-cache_file="${cache_file}/fdb/files"
-if [ ! -d $(dirname "$cache_file") ]; then
-    mkdir -p $(dirname "$cache_file")
-fi
-touch "$cache_file"
+xdg_dir(){ # {{{
+    local store=$1
+    local name=$2
+    local path=
 
-cache_cmds="$XDG_CACHE_HOME"
-[ "x$XDG_CACHE_HOME" = "x" ] && cache_cmds="${HOME}/.cache"
-cache_cmds="${cache_cmds}/fdb/commands"
-if [ ! -d $(dirname "$cache_cmds") ]; then
-    mkdir -p $(dirname "$cache_cmds")
-fi
-touch "$cache_cmds"
+    case "$store" in
+        cache)
+            if [ -z $XDG_CACHE_HOME ]; then
+                path="$HOME/.cache/$name"
+            else
+                path="$XDG_CACHE_HOME/$name"
+            fi
+        ;;
+        config)
+            if [ -z $XDG_CONFIG_HOME ]; then
+                path="$HOME/.config/$name"
+            else
+                path="$XDG_CONFIG_HOME/$name"
+            fi
+        ;;
+    esac
 
-blacklist="$XDG_CONFIG_HOME"
-[ "x$XDG_CONFIG_HOME" = "x" ] && blacklist="${HOME}/.config"
-blacklist="${blacklist}/fdb/blacklist"
-if [ ! -d $(dirname $blacklist) ]; then
-    mkdir -p $(dirname $blacklist)
-fi
-touch "$blacklist"
+    mkdir -p `dirname "$path"`
+    touch "$path"
+    echo "$path"
+    echo "$path" >&2
+    return 0
+} # }}}
 
-directories="$XDG_CONFIG_HOME"
-[ "x$XDG_CONFIG_HOME" = "x" ] && directories="${HOME}/.config"
-directories="${directories}/fdb/directories"
-if [ ! -d $(dirname $directories) ]; then
-    mkdir -p $(dirname $directories)
-fi
-touch "$directories"
+cache_file=`xdg_dir cache fdb/files`
+cache_cmds=`xdg_dir cache fdb/commands`
+
+blacklist=`xdg_dir config fdb/blacklist`
+directories=`xdg_dir config fdb/directories`
 # }}}
 
 rebuilddb() {
