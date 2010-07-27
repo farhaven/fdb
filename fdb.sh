@@ -116,7 +116,7 @@ elif [ "$1" == "update" ]; then # {{{
     # }}}
 fi
 
-obj=`(sed -e 's/^/run /' < "$cache_cmds"; sed -e 's/^/open /' < "$cache_file") | $DMENU -l 7 -p '?'`
+obj=`(sed -e 's/^/run /' < "$cache_cmds"; sed -e 's/^/open /' < "$cache_file") | $DMENU -l 7`
 [[ "" == "$obj" ]] && exit 0
 action=`echo "$obj" | cut -d' ' -f1`
 case "$action" in
