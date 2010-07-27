@@ -42,15 +42,31 @@ cache_cmds=`xdg_dir cache fdb/commands`
 
 blacklist=`xdg_dir config fdb/blacklist`
 directories=`xdg_dir config fdb/directories`
+
+db_rebuild_lock=`xdg_dir cache fdb/db_rebuild`
 # }}}
 
-rebuilddb() {
+verb_sleep() { # {{{
+    local t=$1
+    while [ $t -gt 0 ]; do
+        sleep 1
+        echo -n "."
+        t=`expr $t - 1`
+    done
+    echo
+} # }}}
+
+rebuilddb() { # {{{
+    echo -n "rebuilding database... "
+    touch "$db_rebuild_lock"
     local t=`mktemp`
     while read d; do
         nice -n 20 ionice -c 3 find "$d" | grep -vf "$blacklist" >> "$t" 2> /dev/null
     done < "$directories"
     mv "$t" "$cache_file"
-}
+    rm "$db_rebuild_lock"
+    echo "done"
+} # }}}
 
 verbose="false"
 if [ "$1" == "-v" ]; then
@@ -60,7 +76,7 @@ elif [ "$1" == "rebuild" ]; then
     exit 0
 elif [ "$1" == "update" ]; then # {{{
     # recreate db (in case something changed while we were not watching)
-    rebuilddb
+    rebuilddb &
 
     deleted=0
 
@@ -91,8 +107,9 @@ elif [ "$1" == "update" ]; then # {{{
 
                 deleted=`expr $deleted + 1`
                 if [ $deleted -gt 10 ]; then
-                    echo "mass delete detected. sleeping for 10 seconds and rebuilding the database"
-                    sleep 10
+                    echo "mass delete detected. sleeping for at least 10 seconds and rebuilding the database"
+                    verb_sleep 10
+                    while [ -e "$db_rebuild_lock" ]; do true; done
                     break
                 fi
                 tmp=`mktemp`
