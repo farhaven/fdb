@@ -57,8 +57,20 @@ verb_sleep() { # {{{
     echo
 } # }}}
 
+db_waitlock(){ # {{{
+    if [ -e "$db_rebuild_lock" ]; then
+        echo "database rebuild is in progress... waiting "
+        while [ -e "$db_rebuild_lock" ]; do
+            echo -n "."
+            sleep 1
+        done
+        echo
+    fi
+} # }}}
+
 rebuilddb() { # {{{
     echo -n "rebuilding database... "
+    db_waitlock
     touch "$db_rebuild_lock"
     local t=`mktemp`
     while read d; do
@@ -95,6 +107,8 @@ elif [ "$1" == "update" ]; then # {{{
 
                 deleted=0
 
+                echo "adding $path to file cache"
+                db_waitlock
                 # if a new directory appeared, list all of its contents (this mostly applies to moved directories)
                 if [ -d "$path" ]; then
                     sleep 2 # maybe something got mounted there by pmount or some other kind of mount script
@@ -106,13 +120,16 @@ elif [ "$1" == "update" ]; then # {{{
             *DELETE*|*MOVED_FROM*)
                 echo "$path" | grep -qf "$blacklist" -e "$cache_file" 2>/dev/null && continue
 
+                db_waitlock
                 deleted=`expr $deleted + 1`
                 if [ $deleted -gt 10 ]; then
                     echo "mass delete detected. sleeping for at least 10 seconds and rebuilding the database"
                     verb_sleep 10
-                    while [ -e "$db_rebuild_lock" ]; do true; done
+                    db_waitlock
                     break
                 fi
+
+                echo "deleting $path from file cache"
                 tmp=`mktemp`
                 grep -vF "$path" "$cache_file" > "$tmp"
                 mv "$tmp" "$cache_file"
