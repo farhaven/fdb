@@ -34,7 +34,7 @@ if [[ ( -e "$URL" ) || ($(echo "$URL" | cut -d':' -f1) == "file") ]]; then
             exec gvim --remote "$URL"
             ;;
         *directory)
-            exec thunar "$URL"
+            exec rox "$URL"
             ;;
         *pdf|*dvi)
             exec evince "$URL"
