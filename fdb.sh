@@ -103,7 +103,7 @@ elif [ "$1" == "update" ]; then # {{{
                 grep -qF "$path" "$cache_file" 2> /dev/null && continue
                 # and also no need if it's on the blacklist or if the cache file changed (that'd cause
                 # an infinite loop of changing the cache file over and over)
-                echo "$path" | grep -qf "$blacklist" -e "$cache_file" 2> /dev/null && continue
+                echo "$path" | grep -qf "$blacklist" -e "$cache_file" -e "$db_rebuild_lock" 2> /dev/null && continue
 
                 deleted=0
 
@@ -118,7 +118,7 @@ elif [ "$1" == "update" ]; then # {{{
                 fi
                 ;;
             *DELETE*|*MOVED_FROM*)
-                echo "$path" | grep -qf "$blacklist" -e "$cache_file" 2>/dev/null && continue
+                echo "$path" | grep -qf "$blacklist" -e "$cache_file" -e "$db_rebuild_lock" 2>/dev/null && continue
 
                 db_waitlock
                 deleted=`expr $deleted + 1`
