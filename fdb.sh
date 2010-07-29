@@ -44,6 +44,7 @@ blacklist=`xdg_dir config fdb/blacklist`
 directories=`xdg_dir config fdb/directories`
 
 db_rebuild_lock=`xdg_dir cache fdb/db_rebuild`
+rm "$db_rebuild_lock"
 # }}}
 
 verb_sleep() { # {{{
