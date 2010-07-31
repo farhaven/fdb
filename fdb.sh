@@ -73,6 +73,7 @@ rebuilddb() { # {{{
     touch "$db_rebuild_lock"
     local t=`mktemp`
     while read d; do
+        if ! echo "$d" | grep -q '^@'; then continue; fi
         nice -n 20 ionice -c 3 find "$d" 2>/dev/null | grep -vf "$blacklist" >> "$t"
     done < "$directories"
     mv "$t" "$cache_file"
