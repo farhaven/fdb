@@ -147,6 +147,7 @@ elif [ "$1" == "update" ]; then # {{{
 
         rm -rf "$t"
     done
+    db_waitlock
     exec $0 update
     # }}}
 fi
