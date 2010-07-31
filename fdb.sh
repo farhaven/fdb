@@ -33,7 +33,6 @@ xdg_dir(){ # {{{
     mkdir -p `dirname "$path"`
     touch "$path"
     echo "$path"
-    echo "$path" >&2
     return 0
 } # }}}
 
@@ -74,7 +73,7 @@ rebuilddb() { # {{{
     touch "$db_rebuild_lock"
     local t=`mktemp`
     while read d; do
-        nice -n 20 ionice -c 3 find "$d" | grep -vf "$blacklist" >> "$t" 2> /dev/null
+        nice -n 20 ionice -c 3 find "$d" 2>/dev/null | grep -vf "$blacklist" >> "$t"
     done < "$directories"
     mv "$t" "$cache_file"
     rm "$db_rebuild_lock"
