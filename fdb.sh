@@ -104,7 +104,8 @@ elif [ "$1" == "update" ]; then # {{{
                 # an infinite loop of changing the cache file over and over)
                 echo "$path" | grep -qf "$blacklist" -e "$cache_file" -e "$db_rebuild_lock" 2> /dev/null && continue
 
-                deleted=0
+                deleted=`expr $deleted - 1`
+                [ $deleted -lt 0 ] && deleted=0
 
                 echo "adding $path to file cache"
                 db_waitlock
@@ -120,8 +121,8 @@ elif [ "$1" == "update" ]; then # {{{
                 echo "$path" | grep -qf "$blacklist" -e "$cache_file" -e "$db_rebuild_lock" 2>/dev/null && continue
 
                 db_waitlock
-                deleted=`expr $deleted + 1`
-                if [ $deleted -gt 10 ]; then
+                deleted=`expr $deleted + 2`
+                if [ $deleted -gt 30 ]; then
                     echo "mass delete detected. sleeping for at least 10 seconds and rebuilding the database"
                     verb_sleep 10
                     db_waitlock
