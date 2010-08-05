@@ -75,7 +75,7 @@ rebuilddb() { # {{{
     local t2=`mktemp`
     sed -ne '/^@/s/@//p' < "$directories" > "$t2"
     while read d; do
-        nice -n 20 ionice -c 3 find "$d" 2>/dev/null | grep -vf "$blacklist" -vFf "$t2" >> "$t"
+        nice -n 20 ionice -c 3 find "$d" 2>/dev/null | grep -vf "$blacklist" | grep -vFf "$t2" >> "$t"
     done < "$directories"
     mv "$t" "$cache_file"
     rm "$db_rebuild_lock"
