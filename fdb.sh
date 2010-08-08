@@ -95,7 +95,8 @@ elif [ "$1" == "update" ]; then # {{{
 
     deleted=0
 
-    inotifywait -r -m -e move -e create -e delete -e modify --format "%w%f,%:e" --fromfile "$directories" | while read l; do
+    (inotifywait -r -m -e move -e create -e delete --format "%w%f,%:e" --fromfile "$directories" &
+     inotifywait -m -e attrib --format "%w%f,%:e" "$blacklist" "$directories") | while read l; do
         path=`echo $l | cut -d',' -f1`
         event=`echo $l | cut -d',' -f2`
         
@@ -137,7 +138,7 @@ elif [ "$1" == "update" ]; then # {{{
                 grep -vF "$path" "$cache_file" > "$tmp"
                 mv "$tmp" "$cache_file"
                 ;;
-            *MODIFY*)
+            *ATTRIB*)
                 if [ "$path" == "$blacklist" ]; then
                     echo "blacklist changed, rebuilding database"
                     rebuilddb
