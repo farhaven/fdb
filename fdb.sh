@@ -111,7 +111,7 @@ elif [ "$1" == "update" ]; then # {{{
                 deleted=`expr $deleted - 1`
                 [ $deleted -lt 0 ] && deleted=0
 
-                echo "adding $path to file cache"
+                echo "adding \"$path\" to file cache"
                 db_waitlock
                 # if a new directory appeared, list all of its contents (this mostly applies to moved directories)
                 if [ -d "$path" ]; then
@@ -127,13 +127,13 @@ elif [ "$1" == "update" ]; then # {{{
                 db_waitlock
                 deleted=`expr $deleted + 2`
                 if [ $deleted -gt 30 ]; then
-                    echo "mass delete detected. sleeping for at least 10 seconds and rebuilding the database"
+                    echo "Mass delete detected. Sleeping for at least 10 seconds and rebuilding the database"
                     verb_sleep 10
                     db_waitlock
                     break
                 fi
 
-                echo "deleting $path from file cache"
+                echo "Deleting \"$path\" from file cache"
                 tmp=`mktemp`
                 grep -vF "$path" "$cache_file" > "$tmp"
                 mv "$tmp" "$cache_file"
