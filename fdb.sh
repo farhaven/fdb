@@ -176,7 +176,7 @@ case "$action" in
         echo "$obj" >> "$cache_cmds"
         sort "$cache_cmds" | uniq > "$cache_cmds.$$"
         mv "$cache_cmds.$$" "$cache_cmds"
-        [ "$verbose" == "false" ] && exec $obj
+        [ "$verbose" == "false" ] && exec sh -c "$obj"
         output=`$obj | sed -e 's|<|\&lt;|g' -e 's|>|\&gt;|g'`
         [ "$output" != "" ] && notify-send -- "$output"
         # }}}
