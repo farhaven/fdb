@@ -8,7 +8,7 @@ It uses the inotify feature of recent Linux kernels and is thus only available
 for operating systems implementing inotify (though it _could_ be adapted to, 
 say, dnotify, with some shortcomings).
 The menu is displayed using the `dmenu` utility from http://suckless.org and 
-the notificitations (should a program not be found or the output captured) need 
+the notifications (should a program not be found or the output captured) need
 notify-send (though adapting for `dzen` or
 similar should be trivial).
 
@@ -48,7 +48,7 @@ looks like this:
     /media
 
 `~/.config/fdb/blacklist` contains a list of grep regular expressions for
-pathes not to watch. Mine looks like this:
+paths not to watch. Mine looks like this:
 
     \.adobe
     \..*swp
@@ -80,7 +80,7 @@ to run. Mine looks like this:
     DMENU=$DMENU'-fn -*-terminus-*-*-*-*-12-*-*-*-*-*-*-*' # font
 
 where `-xs`, `-i` and `-o` might need additional patching (`-xs` and `-i` are
-available from the `dmenu` repo, `-o` is a patch i have in my local tree. If
+available from the `dmenu` repo, `-o` is a patch I have in my local tree. If
 anyone wants that, drop me a line (the patch is kind of a mess at the
 moment so I'd rather not put it out there for any unsuspecting soul to
 stumble upon)).
