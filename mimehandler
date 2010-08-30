@@ -24,8 +24,8 @@ if [[ ( -e "$URL" ) || ($(echo "$URL" | cut -d':' -f1) == "file") ]]; then
             fi
             exec cmus-remote -q "$URL"
             ;;
-        video*)
-            exec gnome-mplayer "$URL"
+        video*|*ogg*)
+            exec gnome-mplayer --single_instance "$URL"
             ;;
         image*)
             exec geeqie "$URL"
