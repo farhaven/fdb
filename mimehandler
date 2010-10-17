@@ -36,7 +36,7 @@ if [[ ( -e "$URL" ) || ($(echo "$URL" | cut -d':' -f1) == "file") ]]; then
         *directory)
             exec rox "$URL"
             ;;
-        *pdf|*dvi)
+        *pdf|*dvi|*postscript)
             exec evince "$URL"
             ;;
         *)
