@@ -9,7 +9,7 @@ notify()
 }
 
 if [[ ( -e "$URL" ) || ($(echo "$URL" | cut -d':' -f1) == "file") ]]; then
-    URL=$(echo "$URL" | sed -e 's|^file://||')
+    URL=$(echo "$URL" | sed -e 's|^file://||' -e 's|%20| |g')
     MIME=$(file -b --mime-type "$URL")
     case $MIME in
         *symlink)
