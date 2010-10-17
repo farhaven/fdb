@@ -67,6 +67,24 @@ db_waitlock(){ # {{{
     fi
 } # }}}
 
+adddir() { # {{{
+    local t1=$1
+    local t2=$2
+    shift 2
+    local d="$@"
+
+    nice -n 20 find "$d" -maxdepth 1 -mindepth 1 -type f >> "$t"
+    nice -n 20 find "$d" -maxdepth 1 -mindepth 1 -type d | while read line; do
+        echo "$line" | grep -qf "$t2" || echo "$line" | grep -qf "$blacklist"
+
+        if [[ $? -ne 0 ]]; then
+            echo "$d" >> "$t"
+            adddir "$t1" "$t2" "$line"
+        fi
+    done
+}
+# }}}
+
 rebuilddb() { # {{{
     echo -n "rebuilding database... "
     db_waitlock
@@ -74,9 +92,11 @@ rebuilddb() { # {{{
     local t=`mktemp`
     local t2=`mktemp`
     sed -ne '/^@/s/@//p' < "$directories" > "$t2"
-    while read d; do
-        nice -n 20 ionice -c 3 find "$d" 2>/dev/null | grep -vf "$blacklist" | grep -vFf "$t2" >> "$t"
-    done < "$directories"
+
+    grep -v "^@" "$directories" | while read d; do
+        adddir "$t1" "$t2" "$d"
+    done
+
     mv "$t" "$cache_file"
     rm "$db_rebuild_lock"
     rm "$t2"
