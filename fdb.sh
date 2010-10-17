@@ -41,6 +41,8 @@ cache_cmds=`xdg_dir cache fdb/commands`
 
 blacklist=`xdg_dir config fdb/blacklist`
 directories=`xdg_dir config fdb/directories`
+blacklist_md5=`md5sum "$blacklist" | cut -d' ' -f1`
+directories_md5=`md5sum "$directories" | cut -d' ' -f1`
 
 db_rebuild_lock=`xdg_dir cache fdb/db_rebuild`
 rm "$db_rebuild_lock"
@@ -160,11 +162,18 @@ elif [ "$1" == "update" ]; then # {{{
                 ;;
             *ATTRIB*)
                 if [ "$path" == "$blacklist" ]; then
-                    echo "blacklist changed, rebuilding database"
-                    rebuilddb
+                    md5=`md5sum "$blacklist" | cut -d' ' -f1`
+                    if [ "$blacklist_md5" != "$md5" ]; then
+                        echo "blacklist changed, rebuilding database"
+                        blacklist_md5=`md5sum "$blacklist" | cut -d' ' -f1`
+                        rebuilddb
+                    fi
                 elif [ "$path" == "$directories" ]; then
-                    echo "watchlist changed, reloading"
-                    break
+                    md5=`md5sum "$directories" | cut -d' ' -f1`
+                    if [ "$directories_md5" != "$md5" ]; then
+                        echo "watchlist changed, reloading"
+                        break
+                    fi
                 fi
                 ;;
         esac
