@@ -37,7 +37,7 @@ xdg_dir(){ # {{{
 } # }}}
 
 cache_file=`xdg_dir cache fdb/files`
-cache_cmds=`xdg_dir cache fdb/commands`
+cache_cmds=`xdg_dir config fdb/commands`
 
 blacklist=`xdg_dir config fdb/blacklist`
 directories=`xdg_dir config fdb/directories`
