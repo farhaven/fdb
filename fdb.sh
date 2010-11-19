@@ -202,9 +202,10 @@ case "$action" in
             notify-send "not found: \"$obj\""
             exit 0
         fi
-        echo "$obj" >> "$cache_cmds"
-        sort "$cache_cmds" | uniq > "$cache_cmds.$$"
-        mv "$cache_cmds.$$" "$cache_cmds"
+
+        grep -Fvxe "$obj" "$cache_cmds" > "$cache_cmds.$$"
+        (echo "$obj"; cat "$cache_cmds.$$") > "$cache_cmds"
+
         [ "$verbose" == "false" ] && exec sh -c "$obj"
         output=`$obj | sed -e 's|<|\&lt;|g' -e 's|>|\&gt;|g'`
         [ "$output" != "" ] && notify-send -- "$output"
