@@ -119,7 +119,7 @@ elif [ "$1" == "update" ]; then # {{{
     deleted=0
 
     (inotifywait -r -m -e move -e create -e delete --format "%w%f,%:e" --fromfile "$directories" &
-     inotifywait -m -e attrib --format "%w%f,%:e" "$blacklist" "$directories") | while read l; do
+     inotifywait -m -e attrib --format "%w%f,%:e" "$blacklist" "$directories" "`which $0`") | while read l; do
         path=`echo $l | cut -d',' -f1`
         event=`echo $l | cut -d',' -f2`
         
@@ -173,6 +173,12 @@ elif [ "$1" == "update" ]; then # {{{
                     md5=`md5sum "$directories" | cut -d' ' -f1`
                     if [ "$directories_md5" != "$md5" ]; then
                         echo "watchlist changed, reloading"
+                        break
+                    fi
+                elif [ "$path" == "`which $0`" ]; then
+                    md5=`md5sum "$path" | cut -d' ' -f1`
+                    if [ "$self_md5" != "$md5" ]; then
+                        echo "$path changed... reloading"
                         break
                     fi
                 fi
