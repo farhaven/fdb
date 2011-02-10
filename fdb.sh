@@ -75,8 +75,8 @@ adddir() { # {{{
     shift 2
     local d="$@"
 
-    nice -n 20 find "$d" -maxdepth 1 -mindepth 1 -type f >> "$t"
-    nice -n 20 find "$d" -maxdepth 1 -mindepth 1 -type d | while read line; do
+    find "$d" -maxdepth 1 -mindepth 1 -type f >> "$t"
+    find "$d" -maxdepth 1 -mindepth 1 -type d | while read line; do
         echo "$line" | grep -qf "$t2" || echo "$line" | grep -qf "$blacklist"
 
         if [[ $? -ne 0 ]]; then
@@ -112,6 +112,7 @@ elif [ "$1" == "rebuild" ]; then
     rebuilddb
     exit 0
 elif [ "$1" == "update" ]; then # {{{
+    renice -n 20 $$
     # recreate db (in case something changed while we were not watching)
     rebuilddb &
 
